@@ -116,7 +116,7 @@ ingest ingest calendar-end \
 業務時間外の活動の中で仕事に関連する着想が生まれたときは `--personal` フラグをつけて記録する。
 
 ```bash
-ingest note "〇〇の設計方針のヒントが浮かんだ" --personal --topic <topic-id>
+ingest note "〇〇の設計方針のヒントが浮かんだ" --personal --topic <topic-name>
 ingest note "〇〇という概念が今の課題に使えるかも" --personal
 ```
 
