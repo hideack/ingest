@@ -4,12 +4,19 @@ import { findOrCreateProject } from '../../core/projectService.js';
 import { findOrCreateTopic } from '../../core/topicService.js';
 import { createEvent } from '../../core/eventService.js';
 
+function defaultTaskTitle(summary?: string): string {
+  if (summary) return summary;
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `Session ${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+}
+
 export function registerStart(program: Command): void {
   program
     .command('start')
     .description('Start a new task session')
     .option('--project <name>', 'Project name')
-    .option('--task <title>', 'Task title')
+    .option('--task <title>', 'Task title (auto-generated from --summary or timestamp if omitted)')
     .option('--topic <name>', 'Topic name')
     .option('--summary <text>', 'Summary')
     .action(async (options) => {
@@ -21,12 +28,11 @@ export function registerStart(program: Command): void {
           console.log(`Project: ${project.name} (${project.id})`);
         }
 
-        let taskId: string | undefined;
-        if (options.task) {
-          const task = findOrCreateTask(options.task, projectId);
-          taskId = task.id;
-          console.log(`Task: ${task.title} (${task.id})`);
-        }
+        // Always create/find a task so that subsequent events are linked
+        const taskTitle = options.task ?? defaultTaskTitle(options.summary);
+        const task = findOrCreateTask(taskTitle, projectId);
+        const taskId = task.id;
+        console.log(`Task: ${task.title} (${task.id})`);
 
         let topicId: string | undefined;
         if (options.topic) {
@@ -35,7 +41,7 @@ export function registerStart(program: Command): void {
           console.log(`Topic: ${topic.name} (${topic.id})`);
         }
 
-        const summary = options.summary ?? (options.task ? `Started task: ${options.task}` : 'Started work session');
+        const summary = options.summary ?? `Started task: ${taskTitle}`;
 
         const event = createEvent({
           event_type: 'task_started',
