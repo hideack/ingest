@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { createEvent } from '../../core/eventService.js';
+import { findOrCreateTopic } from '../../core/topicService.js';
 
 export function registerIngestCalendarStart(program: Command): void {
   const ingest = program.commands.find(c => c.name() === 'ingest') ?? program.command('ingest').description('Ingest events from external sources');
@@ -10,15 +11,16 @@ export function registerIngestCalendarStart(program: Command): void {
     .requiredOption('--summary <text>', 'Calendar event title/summary (required)')
     .option('--occurred-at <datetime>', 'Event start time (ISO 8601)')
     .option('--task <id>', 'Associated task ID')
-    .option('--topic <id>', 'Associated topic ID')
+    .option('--topic <name>', 'Associated topic name')
     .option('--project <id>', 'Associated project ID')
     .option('--source-ref <ref>', 'Calendar event ID or reference')
     .action(async (options) => {
       try {
+        const topicId = options.topic ? findOrCreateTopic(options.topic).id : undefined;
         const event = createEvent({
           event_type: 'calendar_event_started',
           task_id: options.task,
-          topic_id: options.topic,
+          topic_id: topicId,
           project_id: options.project,
           actor: 'ai',
           origin: 'gcal',
