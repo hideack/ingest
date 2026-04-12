@@ -94,7 +94,12 @@ export function getRecentEvents(options: {
 
   const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
   const limit = options.limit ?? 50;
-  const sql = `SELECT * FROM events ${where} ORDER BY occurred_at DESC LIMIT ${limit}`;
+  // datetime() normalizes timezone-offset strings (e.g. +09:00) to UTC before
+  // sorting, ensuring correct ordering when events come from git or calendar
+  // sources that may store occurred_at in local-time ISO 8601 format.
+  // The secondary sort on occurred_at provides a deterministic tiebreaker
+  // for events within the same UTC second (datetime() drops milliseconds).
+  const sql = `SELECT * FROM events ${where} ORDER BY datetime(occurred_at) DESC, occurred_at DESC LIMIT ${limit}`;
 
   const stmt = db.prepare(sql);
   return stmt.all(params) as Event[];
@@ -104,12 +109,12 @@ export function getOpenBlockers(taskId?: string): Event[] {
   const db = getDb();
   if (taskId) {
     const stmt = db.prepare(
-      `SELECT * FROM events WHERE event_type = 'blocker_found' AND task_id = ? ORDER BY occurred_at DESC`
+      `SELECT * FROM events WHERE event_type = 'blocker_found' AND task_id = ? ORDER BY datetime(occurred_at) DESC`
     );
     return stmt.all(taskId) as Event[];
   } else {
     const stmt = db.prepare(
-      `SELECT * FROM events WHERE event_type = 'blocker_found' ORDER BY occurred_at DESC`
+      `SELECT * FROM events WHERE event_type = 'blocker_found' ORDER BY datetime(occurred_at) DESC`
     );
     return stmt.all() as Event[];
   }
@@ -120,12 +125,12 @@ export function getRecentDecisions(taskId?: string, limit?: number): Event[] {
   const lim = limit ?? 10;
   if (taskId) {
     const stmt = db.prepare(
-      `SELECT * FROM events WHERE event_type = 'decision_made' AND task_id = ? ORDER BY occurred_at DESC LIMIT ?`
+      `SELECT * FROM events WHERE event_type = 'decision_made' AND task_id = ? ORDER BY datetime(occurred_at) DESC LIMIT ?`
     );
     return stmt.all(taskId, lim) as Event[];
   } else {
     const stmt = db.prepare(
-      `SELECT * FROM events WHERE event_type = 'decision_made' ORDER BY occurred_at DESC LIMIT ?`
+      `SELECT * FROM events WHERE event_type = 'decision_made' ORDER BY datetime(occurred_at) DESC LIMIT ?`
     );
     return stmt.all(lim) as Event[];
   }
@@ -135,12 +140,12 @@ export function getNextActions(taskId?: string): Event[] {
   const db = getDb();
   if (taskId) {
     const stmt = db.prepare(
-      `SELECT * FROM events WHERE event_type = 'next_action_defined' AND task_id = ? ORDER BY occurred_at DESC`
+      `SELECT * FROM events WHERE event_type = 'next_action_defined' AND task_id = ? ORDER BY datetime(occurred_at) DESC`
     );
     return stmt.all(taskId) as Event[];
   } else {
     const stmt = db.prepare(
-      `SELECT * FROM events WHERE event_type = 'next_action_defined' ORDER BY occurred_at DESC`
+      `SELECT * FROM events WHERE event_type = 'next_action_defined' ORDER BY datetime(occurred_at) DESC`
     );
     return stmt.all() as Event[];
   }
