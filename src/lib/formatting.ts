@@ -255,6 +255,42 @@ export function formatTopicsOutput(
   return lines.join('\n');
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  active: 'ACTIVE',
+  paused: 'PAUSED',
+  blocked: 'BLOCKED',
+  closed: 'CLOSED',
+};
+
+export function formatTasksOutput(
+  entries: Array<{ task: Task; metrics: import('../types/metrics.js').TaskMetrics | null }>
+): string {
+  if (entries.length === 0) {
+    return 'No tasks found.';
+  }
+
+  const lines: string[] = [];
+  lines.push('='.repeat(72));
+  lines.push(`TASKS  (${entries.length} total)`);
+  lines.push('='.repeat(72));
+  lines.push(
+    `${'TITLE'.padEnd(28)} ${'STATUS'.padEnd(7)} ${'IMP'.padStart(4)} ${'DRIFT'.padStart(5)} ${'LAST SEEN'.padEnd(16)}`
+  );
+  lines.push('-'.repeat(72));
+
+  for (const { task, metrics } of entries) {
+    const title = truncate(task.title, 28).padEnd(28);
+    const status = (STATUS_LABELS[task.status] ?? task.status).padEnd(7);
+    const imp = task.importance.toFixed(1).padStart(4);
+    const drift = metrics ? metrics.drift_score.toFixed(2).padStart(5) : '  N/A';
+    const lastSeen = metrics?.last_seen_at ? formatDate(metrics.last_seen_at) : 'never';
+    lines.push(`${title} ${status} ${imp} ${drift} ${lastSeen}`);
+  }
+
+  lines.push('='.repeat(72));
+  return lines.join('\n');
+}
+
 export function formatShowOutput(
   topic: Topic,
   events: Event[],
