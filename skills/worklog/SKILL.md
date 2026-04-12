@@ -84,9 +84,9 @@ JSON のフィールド対応:
 
 | JSON フィールド | 説明 | ingest への渡し方 |
 |---|---|---|
-| `summary` | 予定タイトル | `--title` |
-| `start.dateTime` | 開始日時 (RFC3339) | calendar-start の `--at` |
-| `end.dateTime` | 終了日時 (RFC3339) | calendar-end の `--at` |
+| `summary` | 予定タイトル | `--summary` |
+| `start.dateTime` | 開始日時 (RFC3339) | calendar-start の `--occurred-at` |
+| `end.dateTime` | 終了日時 (RFC3339) | calendar-end の `--occurred-at` |
 | `id` | カレンダーイベントID | `--source-ref` |
 
 ### ステップ 2: 各イベントを ingest に渡す
@@ -95,13 +95,13 @@ JSON のフィールド対応:
 
 ```bash
 ingest ingest calendar-start \
-  --title "<予定タイトル>" \
-  --at "<開始日時 RFC3339>" \
+  --summary "<予定タイトル>" \
+  --occurred-at "<開始日時 RFC3339>" \
   --source-ref "<event id>"
 
 ingest ingest calendar-end \
-  --title "<予定タイトル>" \
-  --at "<終了日時 RFC3339>" \
+  --summary "<予定タイトル>" \
+  --occurred-at "<終了日時 RFC3339>" \
   --source-ref "<event id>"
 ```
 
