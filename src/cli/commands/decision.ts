@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { createEvent } from '../../core/eventService.js';
+import { findOrCreateTopic } from '../../core/topicService.js';
 
 export function registerDecision(program: Command): void {
   program
@@ -8,14 +9,15 @@ export function registerDecision(program: Command): void {
     .requiredOption('--summary <text>', 'Decision summary (required)')
     .option('--importance <number>', 'Importance score (1-10)', parseFloat)
     .option('--task <id>', 'Task ID')
-    .option('--topic <id>', 'Topic ID')
+    .option('--topic <name>', 'Topic name')
     .option('--details <text>', 'Additional details')
     .action(async (options) => {
       try {
+        const topicId = options.topic ? findOrCreateTopic(options.topic).id : undefined;
         const event = createEvent({
           event_type: 'decision_made',
           task_id: options.task,
-          topic_id: options.topic,
+          topic_id: topicId,
           actor: 'human',
           origin: 'manual',
           summary: options.summary,

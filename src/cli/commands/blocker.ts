@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { createEvent } from '../../core/eventService.js';
 import { updateTaskStatus } from '../../core/taskService.js';
+import { findOrCreateTopic } from '../../core/topicService.js';
 
 export function registerBlocker(program: Command): void {
   program
@@ -8,15 +9,16 @@ export function registerBlocker(program: Command): void {
     .description('Record a blocker')
     .requiredOption('--summary <text>', 'Blocker summary (required)')
     .option('--task <id>', 'Task ID')
-    .option('--topic <id>', 'Topic ID')
+    .option('--topic <name>', 'Topic name')
     .option('--details <text>', 'Additional details')
     .option('--block-task', 'Update task status to blocked')
     .action(async (options) => {
       try {
+        const topicId = options.topic ? findOrCreateTopic(options.topic).id : undefined;
         const event = createEvent({
           event_type: 'blocker_found',
           task_id: options.task,
-          topic_id: options.topic,
+          topic_id: topicId,
           actor: 'human',
           origin: 'manual',
           summary: options.summary,

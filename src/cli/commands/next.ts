@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { createEvent } from '../../core/eventService.js';
+import { findOrCreateTopic } from '../../core/topicService.js';
 
 export function registerNext(program: Command): void {
   program
@@ -7,14 +8,15 @@ export function registerNext(program: Command): void {
     .description('Define the next action')
     .requiredOption('--summary <text>', 'Next action summary (required)')
     .option('--task <id>', 'Task ID')
-    .option('--topic <id>', 'Topic ID')
+    .option('--topic <name>', 'Topic name')
     .option('--details <text>', 'Additional details')
     .action(async (options) => {
       try {
+        const topicId = options.topic ? findOrCreateTopic(options.topic).id : undefined;
         const event = createEvent({
           event_type: 'next_action_defined',
           task_id: options.task,
-          topic_id: options.topic,
+          topic_id: topicId,
           actor: 'human',
           origin: 'manual',
           summary: options.summary,
