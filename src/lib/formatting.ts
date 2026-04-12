@@ -255,6 +255,28 @@ export function formatTopicsOutput(
   return lines.join('\n');
 }
 
+export function formatNextActionsOutput(events: Event[]): string {
+  if (events.length === 0) {
+    return 'No next actions found.';
+  }
+
+  const lines: string[] = [];
+  lines.push('='.repeat(72));
+  lines.push(`NEXT ACTIONS  (${events.length} entries)`);
+  lines.push('='.repeat(72));
+  lines.push(`${'ID'.padEnd(21)} ${'DATE'.padEnd(16)} ${'SUMMARY'}`);
+  lines.push('-'.repeat(72));
+
+  for (const e of events) {
+    const date = formatDate(e.occurred_at).padEnd(16);
+    lines.push(`${e.id.padEnd(21)} ${date} ${truncate(e.summary, 30)}`);
+  }
+
+  lines.push('='.repeat(72));
+  lines.push('To promote: ingest promote --next <ID> [--title <custom title>]');
+  return lines.join('\n');
+}
+
 const STATUS_LABELS: Record<string, string> = {
   active: 'ACTIVE',
   paused: 'PAUSED',
