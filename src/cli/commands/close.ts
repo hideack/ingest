@@ -1,25 +1,39 @@
 import { Command } from 'commander';
 import { createEvent } from '../../core/eventService.js';
-import { updateTaskStatus, getTask, getActiveTasks } from '../../core/taskService.js';
+import { updateTaskStatus, getTask, getActiveTasks, getLastStartedActiveTask } from '../../core/taskService.js';
 
 export function registerClose(program: Command): void {
   program
     .command('close')
-    .description('Close a task (closes the most recently active task if --task is omitted)')
+    .description('Close a task (auto-selects when only one active task exists)')
     .option('--task <id>', 'Task ID to close')
     .option('--summary <text>', 'Closing summary')
     .action(async (options) => {
       try {
         let taskId: string | undefined = options.task;
 
-        // If no task ID specified, fall back to the most recently active task
         if (!taskId) {
           const activeTasks = getActiveTasks();
           if (activeTasks.length === 0) {
             console.error('No active tasks found. Nothing to close.');
             process.exit(1);
           }
-          taskId = activeTasks[0].id;
+          if (activeTasks.length === 1) {
+            taskId = activeTasks[0].id;
+          } else {
+            // Multiple active tasks — show list with default suggestion
+            const suggested = getLastStartedActiveTask();
+            console.error(`Multiple active tasks found. Specify --task <id>:`);
+            for (const t of activeTasks) {
+              const marker = suggested && t.id === suggested.id ? ' *' : '';
+              console.error(`  ${t.id}  ${t.title}${marker}`);
+            }
+            if (suggested) {
+              console.error(`\n* Most recently started (suggested default)`);
+              console.error(`  Run: ingest close --task ${suggested.id}`);
+            }
+            process.exit(1);
+          }
         }
 
         const task = getTask(taskId);

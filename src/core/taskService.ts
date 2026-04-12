@@ -57,6 +57,18 @@ export function getActiveTasks(): Task[] {
   ).all() as Task[];
 }
 
+export function getLastStartedActiveTask(): Task | null {
+  const db = getDb();
+  const row = db.prepare(`
+    SELECT t.* FROM tasks t
+    INNER JOIN events e ON e.task_id = t.id
+    WHERE t.status = 'active' AND e.event_type = 'task_started'
+    ORDER BY e.occurred_at DESC
+    LIMIT 1
+  `).get() as Task | undefined;
+  return row ?? null;
+}
+
 export function getAllTasksWithMetrics(
   status?: TaskStatus
 ): Array<{ task: Task; metrics: TaskMetrics | null }> {
