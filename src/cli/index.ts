@@ -16,6 +16,9 @@ import { registerIngestCalendarEnd } from './commands/ingestCalendarEnd.js';
 import { registerIngestGitCommit } from './commands/ingestGitCommit.js';
 import { registerIngestArtifactUpdated } from './commands/ingestArtifactUpdated.js';
 import { registerSkill } from './commands/skill.js';
+import { registerLog } from './commands/log.js';
+import { registerTopics } from './commands/topics.js';
+import { registerShow } from './commands/show.js';
 
 // Ensure ~/.worklog directory and DB exist on startup
 const worklogDir = join(process.env.HOME ?? '.', '.worklog');
@@ -42,5 +45,8 @@ registerIngestCalendarEnd(program);
 registerIngestGitCommit(program);
 registerIngestArtifactUpdated(program);
 registerSkill(program);
+registerLog(program);
+registerTopics(program);
+registerShow(program);
 
 program.parse();

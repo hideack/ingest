@@ -33,3 +33,20 @@ export function getTopic(id: string): Topic | null {
   const db = getDb();
   return (db.prepare('SELECT * FROM topics WHERE id = ?').get(id) as Topic) ?? null;
 }
+
+export function findTopicByName(name: string): Topic | null {
+  const db = getDb();
+  return (db.prepare('SELECT * FROM topics WHERE name = ? LIMIT 1').get(name) as Topic) ?? null;
+}
+
+export function getAllTopicsWithMetrics(): Array<{ topic: Topic; metrics: import('../types/metrics.js').TopicMetrics | null }> {
+  const db = getDb();
+  const topics = db.prepare('SELECT * FROM topics ORDER BY name ASC').all() as Topic[];
+
+  return topics.map((topic) => {
+    const metrics = (db.prepare(
+      `SELECT * FROM topic_metrics WHERE topic_id = ? ORDER BY calculated_at DESC LIMIT 1`
+    ).get(topic.id) as import('../types/metrics.js').TopicMetrics) ?? null;
+    return { topic, metrics };
+  });
+}
