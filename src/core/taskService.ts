@@ -1,5 +1,6 @@
 import { getDb } from '../db/client.js';
 import { Task, TaskStatus } from '../types/task.js';
+import { TaskMetrics } from '../types/metrics.js';
 import { generateId } from '../lib/ids.js';
 import { nowISO } from '../lib/time.js';
 
@@ -54,4 +55,20 @@ export function getActiveTasks(): Task[] {
   return db.prepare(
     "SELECT * FROM tasks WHERE status = 'active' ORDER BY importance DESC, updated_at DESC"
   ).all() as Task[];
+}
+
+export function getAllTasksWithMetrics(
+  status?: TaskStatus
+): Array<{ task: Task; metrics: TaskMetrics | null }> {
+  const db = getDb();
+  const tasks = status
+    ? (db.prepare('SELECT * FROM tasks WHERE status = ? ORDER BY importance DESC, updated_at DESC').all(status) as Task[])
+    : (db.prepare("SELECT * FROM tasks WHERE status != 'closed' ORDER BY importance DESC, updated_at DESC").all() as Task[]);
+
+  return tasks.map((task) => {
+    const metrics = (db.prepare(
+      'SELECT * FROM task_metrics WHERE task_id = ? ORDER BY calculated_at DESC LIMIT 1'
+    ).get(task.id) as TaskMetrics) ?? null;
+    return { task, metrics };
+  });
 }

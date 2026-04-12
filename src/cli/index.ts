@@ -18,6 +18,7 @@ import { registerIngestArtifactUpdated } from './commands/ingestArtifactUpdated.
 import { registerSkill } from './commands/skill.js';
 import { registerLog } from './commands/log.js';
 import { registerTopics } from './commands/topics.js';
+import { registerTasks } from './commands/tasks.js';
 import { registerShow } from './commands/show.js';
 
 // Ensure ~/.worklog directory and DB exist on startup
@@ -47,6 +48,7 @@ registerIngestArtifactUpdated(program);
 registerSkill(program);
 registerLog(program);
 registerTopics(program);
+registerTasks(program);
 registerShow(program);
 
 program.parse();
