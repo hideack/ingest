@@ -125,7 +125,9 @@ describe('getRecentEvents', () => {
   it('returns events in occurred_at DESC order', () => {
     const events = getRecentEvents({ limit: 10 });
     for (let i = 1; i < events.length; i++) {
-      expect(events[i - 1].occurred_at >= events[i].occurred_at).toBe(true);
+      const prev = new Date(events[i - 1].occurred_at).getTime();
+      const curr = new Date(events[i].occurred_at).getTime();
+      expect(prev >= curr).toBe(true);
     }
   });
 });
