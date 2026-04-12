@@ -47,7 +47,7 @@ export function createEvent(input: CreateEventInput): Event {
   return getEventById(id)!;
 }
 
-function getEventById(id: string): Event | null {
+export function getEventById(id: string): Event | null {
   const db = getDb();
   const stmt = db.prepare('SELECT * FROM events WHERE id = ?');
   return (stmt.get(id) as Event) ?? null;
