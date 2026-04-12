@@ -57,6 +57,11 @@ export function getActiveTasks(): Task[] {
   ).all() as Task[];
 }
 
+export function findTaskByTitle(title: string): Task | null {
+  const db = getDb();
+  return (db.prepare('SELECT * FROM tasks WHERE title = ? LIMIT 1').get(title) as Task) ?? null;
+}
+
 export function getLastStartedActiveTask(): Task | null {
   const db = getDb();
   const row = db.prepare(`

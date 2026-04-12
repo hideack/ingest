@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { createEvent } from '../../core/eventService.js';
-import { updateTaskStatus, getTask, getActiveTasks, getLastStartedActiveTask } from '../../core/taskService.js';
+import { updateTaskStatus, getTask, findTaskByTitle, getActiveTasks, getLastStartedActiveTask } from '../../core/taskService.js';
 
 export function registerClose(program: Command): void {
   program
@@ -36,11 +36,12 @@ export function registerClose(program: Command): void {
           }
         }
 
-        const task = getTask(taskId);
+        const task = getTask(taskId) ?? findTaskByTitle(taskId);
         if (!task) {
           console.error(`Task not found: ${taskId}`);
           process.exit(1);
         }
+        taskId = task.id;
 
         const summary = options.summary ?? `Closed task: ${task.title}`;
 
