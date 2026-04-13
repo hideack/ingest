@@ -34,6 +34,19 @@ export function getTopic(id: string): Topic | null {
   return (db.prepare('SELECT * FROM topics WHERE id = ?').get(id) as Topic) ?? null;
 }
 
+export function updateTopic(id: string, fields: { name?: string; base_importance?: number }): void {
+  const db = getDb();
+  const now = nowISO();
+  const sets: string[] = [];
+  const values: unknown[] = [];
+  if (fields.name !== undefined) { sets.push('name = ?'); values.push(fields.name); }
+  if (fields.base_importance !== undefined) { sets.push('base_importance = ?'); values.push(fields.base_importance); }
+  if (sets.length === 0) return;
+  sets.push('updated_at = ?');
+  values.push(now, id);
+  db.prepare(`UPDATE topics SET ${sets.join(', ')} WHERE id = ?`).run(...values);
+}
+
 export function findTopicByName(name: string): Topic | null {
   const db = getDb();
   return (db.prepare('SELECT * FROM topics WHERE name = ? LIMIT 1').get(name) as Topic) ?? null;

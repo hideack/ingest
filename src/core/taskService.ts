@@ -50,6 +50,23 @@ export function updateTaskStatus(id: string, status: TaskStatus): void {
   db.prepare('UPDATE tasks SET status = ?, updated_at = ? WHERE id = ?').run(status, now, id);
 }
 
+export function updateTask(
+  id: string,
+  fields: { title?: string; importance?: number; status?: TaskStatus }
+): void {
+  const db = getDb();
+  const now = nowISO();
+  const sets: string[] = [];
+  const values: unknown[] = [];
+  if (fields.title !== undefined) { sets.push('title = ?'); values.push(fields.title); }
+  if (fields.importance !== undefined) { sets.push('importance = ?'); values.push(fields.importance); }
+  if (fields.status !== undefined) { sets.push('status = ?'); values.push(fields.status); }
+  if (sets.length === 0) return;
+  sets.push('updated_at = ?');
+  values.push(now, id);
+  db.prepare(`UPDATE tasks SET ${sets.join(', ')} WHERE id = ?`).run(...values);
+}
+
 export function getActiveTasks(): Task[] {
   const db = getDb();
   return db.prepare(

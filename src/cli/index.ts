@@ -21,6 +21,7 @@ import { registerTopics } from './commands/topics.js';
 import { registerTasks } from './commands/tasks.js';
 import { registerShow } from './commands/show.js';
 import { registerPromote } from './commands/promote.js';
+import { registerEdit } from './commands/edit.js';
 
 // Ensure ~/.worklog directory and DB exist on startup
 const worklogDir = join(process.env.HOME ?? '.', '.worklog');
@@ -52,5 +53,6 @@ registerTopics(program);
 registerTasks(program);
 registerShow(program);
 registerPromote(program);
+registerEdit(program);
 
 program.parse();
