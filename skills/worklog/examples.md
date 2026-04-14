@@ -176,7 +176,55 @@ ingest decision "〇〇については今週中に方針を決定する"
 
 ---
 
-## 6. タイトル揺れを正規化する
+## 6. 登録済みタスク・トピックを修正する
+
+タスクのタイトルを入力ミスした、重要度を見直したいといったケースです。
+
+```bash
+# タスク一覧で ID とタイトルを確認
+ingest tasks
+
+# タイトルを修正（タイトルで指定）
+ingest edit task "認章機能の実装" --title "認証機能の実装"
+```
+
+出力例:
+```
+Task updated: xK9mP2
+  title:      認章機能の実装 → 認証機能の実装
+```
+
+```bash
+# 重要度を上げる（ID で指定）
+ingest edit task xK9mP2 --importance 8.5
+```
+
+出力例:
+```
+Task updated: xK9mP2
+  importance: 5 → 8.5
+```
+
+```bash
+# ステータスを一時停止に変更
+ingest edit task xK9mP2 --status paused
+```
+
+```bash
+# トピックの名前と重要度を一度に変更
+ingest edit topic "auth" --name "認証・認可" --importance 7.0
+```
+
+出力例:
+```
+Topic updated: tY3pR1
+  name:            auth → 認証・認可
+  base_importance: 5 → 7
+```
+
+---
+
+## 7. タイトル揺れを正規化する
 
 複数セッションにわたって類似タスクが別々に作られてしまった場合のケースです。
 

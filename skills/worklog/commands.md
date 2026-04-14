@@ -109,6 +109,63 @@ ingest close
 
 ---
 
+## 編集コマンド
+
+### `ingest edit task <id|タイトル>`
+
+登録済みタスクの情報を変更します。
+
+```bash
+# タイトルを変更
+ingest edit task "旧タイトル" --title "新タイトル"
+
+# 重要度を変更（0〜10）
+ingest edit task <task-id> --importance 8.5
+
+# ステータスを変更
+ingest edit task <task-id> --status paused
+
+# 複数フィールドを一度に変更
+ingest edit task "タスク名" --title "新タイトル" --importance 7.0 --status active
+```
+
+**オプション**
+
+| オプション | 説明 |
+|---|---|
+| `--title <text>` | タスクのタイトルを変更 |
+| `--importance <0-10>` | 重要度スコアを変更（変更は `importance_reassessed` イベントとして記録） |
+| `--status <status>` | ステータスを変更（`active` / `paused` / `blocked` / `closed`） |
+
+- タスクは ID またはタイトルのどちらで指定しても検索されます
+- 引数を何も指定しないとエラーになります
+
+---
+
+### `ingest edit topic <id|名前>`
+
+登録済みトピックの情報を変更します。
+
+```bash
+# 名前を変更
+ingest edit topic "旧名前" --name "新名前"
+
+# 基本重要度を変更（0〜10）
+ingest edit topic "トピック名" --importance 6.0
+
+# 両方を一度に変更
+ingest edit topic <topic-id> --name "新名前" --importance 6.0
+```
+
+**オプション**
+
+| オプション | 説明 |
+|---|---|
+| `--name <text>` | トピック名を変更 |
+| `--importance <0-10>` | 基本重要度スコアを変更 |
+
+---
+
 ## ingest コマンド（外部イベントの取り込み）
 
 ### `ingest ingest calendar-start --title <title> --at <datetime>`

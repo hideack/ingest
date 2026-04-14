@@ -150,6 +150,36 @@ ingest sync files
 
 ---
 
+## 登録済み情報の修正
+
+タスクやトピックの内容（タイトル・重要度・ステータスなど）を後から変更したい場合は `ingest edit` を使用する。
+
+```bash
+# タスクのタイトルを変更
+ingest edit task "旧タイトル" --title "新タイトル"
+
+# タスクの重要度を変更（0〜10）
+ingest edit task <task-id> --importance 8.5
+
+# タスクのステータスを変更（active | paused | blocked | closed）
+ingest edit task <task-id> --status paused
+
+# 複数フィールドを一度に変更
+ingest edit task "タスク名" --title "新タイトル" --importance 7.0
+
+# トピックの名前を変更
+ingest edit topic "旧名前" --name "新名前"
+
+# トピックの基本重要度を変更
+ingest edit topic "トピック名" --importance 6.0
+```
+
+- タスクは ID またはタイトルのどちらでも指定できる
+- importance の変更は `importance_reassessed` イベントとして監査ログに記録される
+- タイトル揺れを正規化したい場合は `match suggest` / `match apply` を優先する
+
+---
+
 ## タイトル揺れへの対処
 
 タスクタイトルの表記揺れ（例: 「機能A設計」と「機能Aの設計」）は完全一致で判定しません。  
